@@ -1,0 +1,75 @@
+---
+- name: install parted
+  apt:
+    name: parted
+    state: present
+  become: yes
+
+- name: unmount swap disk
+  mount:
+     path: "{{ swap_disk }}"
+     state: unmounted
+  become: yes
+
+- name: get partition info
+  parted:
+    device: "{{ swap_disk }}"
+    register: info
+  become: yes
+
+- name: remove existing partitions from swap disk
+  parted:
+    device: "{{ swap_disk }}"
+    number: "{{ item.num }}"
+    state: absent
+  loop: "{{ info.partitions }}"
+  become: yes
+
+- name: Create new partition on swap disk
+  parted:
+    device: "{{ swap_disk }}"
+    number: 1
+    state: present
+    fs_type: ext4
+  become: yes
+
+- name: check if solana-accounts exists
+  stat:
+    path: /mnt/solana-accounts
+  register: accounts
+  become: yes
+
+- name: create /mnt/solana-accounts
+  file:
+    path: /mnt/solana-accounts
+    state: directory
+  when: not accounts.stat.exists
+  become: yes
+
+- name: unmount swap disk
+  mount:
+     path: "{{ swap_disk }}"
+     state: unmounted
+  become: yes
+
+- name: make swap disk
+  shell:
+    cmd: |
+      mkswap {{ swap_disk }}p1
+  become: yes
+
+- name: add swap to fstab
+  lineinfile:
+    path: /etc/fstab
+    line: "{{ swap_disk }}p1 swap swap default 0 0"
+    state: present
+    backup: yes
+  become: yes
+
+- name: enable swap
+  shell: swapon -a
+  become: yes
+
+- name: mount tmpfs
+  shell: mount /mnt/solana-accounts
+  become: yes

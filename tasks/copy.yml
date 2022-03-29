@@ -1,0 +1,16 @@
+---
+- name: copy identity key
+  copy:
+    src: files/validator-keypair.json
+    dest: /home/{{ ansible_user }}/
+
+- name: copy vote key
+  copy:
+    src: files/vote-account-keypair.json
+    dest: /home/{{ ansible_user }}/
+
+- name: copy validator start up script
+  copy:
+    src: files/validator.sh
+    dest: /usr/local/bin/
+  become: yes

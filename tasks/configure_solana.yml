@@ -1,0 +1,24 @@
+---
+- name: set solana config to use keypair
+  shell: solana config set --keypair ~/validator-keypair.json
+
+- name: check if ledger exists
+  stat:
+    path: /mnt/ledger
+  register: ledger
+  become: yes
+
+- name: create /mnt/ledger
+  file:
+    path: /mnt/ledger
+    state: directory
+  when: not ledger.stat.exists
+  become: yes
+
+- name: enable solana system tuner service
+  shell: systemctl enable --now solana-sys-tuner
+  become: yes
+
+- name: enable solana validtor service
+  shell: systemctl enable sol
+  become: yes

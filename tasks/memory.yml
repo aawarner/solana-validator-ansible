@@ -1,0 +1,30 @@
+---
+- name: Increase memory mapped files limit
+  shell:
+    cmd: |
+      bash -c "cat >/etc/sysctl.d/20-solana-mmaps.conf <<EOF
+      # Increase memory mapped files limit
+      vm.max_map_count = 700000
+      EOF"
+  become: yes
+
+- name: Enable increased memory map
+  shell:
+    cmd: |
+      sysctl -p /etc/sysctl.d/20-solana-mmaps.conf
+  become: yes
+
+- name: Restart systemctl daemon
+  shell:
+    cmd: |
+      systemctl daemon-reload
+  become: yes
+
+- name: Increase process file descriptor count limit
+  shell:
+    cmd: |
+      bash -c "cat >/etc/security/limits.d/90-solana-nofiles.conf <<EOF
+      # Increase process file descriptor count limit
+      * - nofile 700000
+      EOF"
+  become: yes

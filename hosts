@@ -1,0 +1,2 @@
+[nodes]
+validator "ansible_host={{ host_ip }}" "ansible_hostname={{ hostname }}"

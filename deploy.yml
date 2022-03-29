@@ -1,0 +1,16 @@
+---
+- hosts: validator
+  gather_facts: no
+  environment:
+    PATH: /home/sol/.local/share/solana/install/active_release/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
+  tasks:
+    - include: tasks/update.yml
+    - include: tasks/ufw.yml
+    - include: tasks/solana_install.yml
+    - include: tasks/service.yml
+    - include: tasks/tuning.yml
+    - include: tasks/memory.yml
+    - include: tasks/copy.yml
+    - include: tasks/configure_solana.yml
+    - include: tasks/configure_haproxy.yml

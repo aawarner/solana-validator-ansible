@@ -1,0 +1,45 @@
+---
+- name: install ufw
+  apt:
+    name: ufw
+    state: present
+  become: yes
+
+- name: Allow SSH in UFW
+  ufw:
+    rule: allow
+    port: 22
+    proto: tcp
+    src: "{{ item }}"
+  loop:
+    - "{{ allowed_ssh_ip_1 }}"
+    - "{{ allowed_ssh_ip_2 }}"
+    - "{{ allowed_ssh_ip_3 }}"
+    - "{{ allowed_ssh_ip_4 }}"
+  become: yes
+
+- name: Allow solana in UFW
+  ufw:
+    rule: allow
+    port: "{{ solana_port_range }}"
+    proto: udp
+  become: yes
+
+- name: Allow RPC in UFW
+  ufw:
+    rule: allow
+    port: 8899
+    proto: tcp
+    src: "{{ item }}"
+  loop:
+    - "{{ allowed_ssh_ip_1 }}"
+    - "{{ allowed_ssh_ip_2 }}"
+    - "{{ allowed_ssh_ip_3 }}"
+    - "{{ allowed_ssh_ip_4 }}"
+  become: yes
+
+- name: Set UFW default policy
+  ufw:
+    state: enabled
+    policy: allow
+  become: yes

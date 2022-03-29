@@ -1,0 +1,45 @@
+---
+- name: create solana service
+  shell:
+    cmd: |
+      bash -c "cat >/etc/systemd/system/sol.service <<EOF
+      [Unit]
+      Description=Solana Validator
+      After=network.target
+      Wants=solana-sys-tuner.service
+      StartLimitIntervalSec=0
+
+      [Service]
+      Type=simple
+      Restart=always
+      RestartSec=1
+      User=sol
+      LimitNOFILE=700000
+      LogRateLimitIntervalSec=0
+      Environment="PATH=/bin:/usr/bin:/home/sol/.local/share/solana/install/active_release/bin"
+      ExecStart=/usr/local/bin/validator.sh
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF"
+  become: yes
+
+- name: create system tuner service
+  shell:
+    cmd: |
+      bash -c "cat >/etc/systemd/system/solana-sys-tuner.service <<EOF
+      [Unit]
+      Description=Solana System Tuner
+      After=network.target
+
+      [Service]
+      Type=simple
+      Restart=on-failure
+      RestartSec=1
+      LogRateLimitIntervalSec=0
+      ExecStart=/home/sol/.local/share/solana/install/active_release/bin/solana-sys-tuner --user sol
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF"
+  become: yes

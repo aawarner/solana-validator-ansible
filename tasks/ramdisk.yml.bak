@@ -1,0 +1,22 @@
+---
+- name: install haproxy
+  apt:
+    name: haproxy
+    state: present
+  become: yes
+
+- name: copy certificate to host
+  copy:
+    src: files/server.pem
+    dest: /etc/ssl/private/
+  become: yes
+
+- name: copy haproxy config
+  copy:
+    src: files/haproxy.cfg
+    dest: /etc/haproxy/
+  become: yes
+
+- name: enable haproxy
+  shell: systemctl enable --now haproxy
+  become: yes

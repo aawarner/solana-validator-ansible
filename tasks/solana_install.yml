@@ -1,0 +1,11 @@
+---
+- name: Download solana tool suite
+  shell: curl -sSfL https://release.solana.com/{{ solana_version|quote }}/install > install.sh
+  register: command_result
+
+- debug:
+    var: command_result
+
+- name: Install solana tool suite
+  shell: chmod +x install.sh && ./install.sh
+  become: false
